@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD NBA</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Administracion de jugadores</h1>
+    </header>
+
+    <div class="container">
+
+        <div class="form-container">
+            <h2>Agregar un nuevo jugador</h2>
+            <form id="player-form">
+                <input type="text" id="name" placeholder="Player Name" required>
+                <input type="text" id="team" placeholder="Team" required>
+                <input type="number" id="number" placeholder="Jersey Number" required>
+                <button type="submit" id="submit">Agregar jugador</button>
+            </form>
+        </div>
+
+        <div class="player-list-container">
+            <h2>Lista de jugadores</h2>
+            <table id="player-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Equipo</th>
+                        <th>Number</th>
+                        <th>Editar / Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script src="./index.js"></script>
+</body>
+
+</html>

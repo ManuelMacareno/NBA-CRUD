@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderPlayers() {
-        playerTable.innerHTML = '';  
+        playerTable.innerHTML = '';
         players.forEach((player, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -23,26 +23,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${player.team}</td>
                 <td>${player.number}</td>
                 <td>
-                    <button onclick="editPlayer(${index})">Edit</button>
-                    <button onclick="deletePlayer(${index})">Delete</button>
+                    <button onclick="editPlayer(${index})">Editar</button>
+                    <button onclick="deletePlayer(${index})">Eliminar</button>
                 </td>
             `;
             playerTable.appendChild(row);
         });
     }
 
-    window.deletePlayer = function (index) {  
-        players.splice(index, 1); 
-        renderPlayers();  
+    window.deletePlayer = function (index) {
+        players.splice(index, 1);
+        renderPlayers();
     };
 
-    window.editPlayer = function (index) { 
+    window.editPlayer = function (index) {
         const player = players[index];
         document.getElementById('name').value = player.name;
         document.getElementById('team').value = player.team;
         document.getElementById('number').value = player.number;
 
-        editingIndex = index; 
+        editingIndex = index;
     };
 
     form.addEventListener('submit', (e) => {
@@ -56,12 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 addPlayer(name, team, number);
             } else {
                 updatePlayer(editingIndex, name, team, number);
-                editingIndex = -1; 
+                editingIndex = -1;
             }
         } else {
             alert('Please fill out all fields');
         }
 
-        form.reset(); 
+        form.reset();
     });
 });

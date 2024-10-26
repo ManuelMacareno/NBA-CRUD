@@ -1,21 +1,19 @@
 from flask import Flask, jsonify, request
 import sqlite3
 import csv
-from flask_cors import CORS  # Importar CORS
+from flask_cors import CORS 
 
 app = Flask(__name__)
-CORS(app)  # Habilitar CORS para toda la aplicación
+CORS(app)
 
 @app.route('/')
 def home():
     return jsonify({"message": "Welcome to the Flask app!"})
 
-# Conexión a la base de datos
 def connect_db():
     conn = sqlite3.connect("jugadores.db")
     return conn
 
-# Inicializar la base de datos y cargar datos del CSV
 def init_db():
     conn = connect_db()
     cursor = conn.cursor()
@@ -29,18 +27,19 @@ def init_db():
     ''')
     conn.commit()
 
-    # Cargar datos desde el CSV a la base de datos si está vacío
     cursor.execute("SELECT COUNT(*) FROM jugadores")
     if cursor.fetchone()[0] == 0:
         with open("jugadores.csv", newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                cursor.execute("INSERT INTO jugadores (name, team, number) VALUES (?, ?, NULL)",
-                               (row["player_name"], row["team_abreviation"]))
+                cursor.execute("SELECT * FROM jugadores WHERE name = ? AND team = ?", (row["player_name"], row["team_abbreviation"]))
+                existing_player = cursor.fetchone()
+
+                if existing_player is None:
+                    cursor.execute("INSERT INTO jugadores (name, team, number) VALUES (?, ?, NULL)", (row["player_name"], row["team_abbreviation"]))
         conn.commit()
     conn.close()
 
-# Rutas para CRUD
 @app.route("/players", methods=["GET"])
 def get_players():
     conn = connect_db()
@@ -55,17 +54,44 @@ def add_player():
     data = request.get_json()
     conn = connect_db()
     cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM jugadores WHERE name = ? AND team = ?", (data["name"], data["team"]))
+    existing_player = cursor.fetchone()
+    
+    if existing_player:
+        return jsonify({"error": "Player already exists"}), 400
+
     cursor.execute("INSERT INTO jugadores (name, team, number) VALUES (?, ?, ?)",
-                   (data["name"], data["team"], data.get("number")))  # Puede ser NULL si no se envía
+                   (data["name"], data["team"], data.get("number"))) 
     conn.commit()
     conn.close()
     return jsonify({"status": "Player added"}), 201
+
+@app.route("/players/<int:id>", methods=["GET"])
+def get_player(id):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM jugadores WHERE id = ?", (id,))
+    player = cursor.fetchone()
+    conn.close()
+    
+    if player:
+        return jsonify({"id": player[0], "name": player[1], "team": player[2], "number": player[3]})
+    else:
+        return jsonify({"error": "Player not found"}), 404
 
 @app.route("/players/<int:id>", methods=["PUT"])
 def update_player(id):
     data = request.get_json()
     conn = connect_db()
     cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM jugadores WHERE id = ?", (id,))
+    player = cursor.fetchone()
+    
+    if not player:
+        return jsonify({"error": "Player not found"}), 404
+
     cursor.execute("UPDATE jugadores SET name = ?, team = ?, number = ? WHERE id = ?",
                    (data["name"], data["team"], data.get("number"), id))
     conn.commit()

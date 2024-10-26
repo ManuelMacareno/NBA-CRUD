@@ -8,10 +8,9 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
-    password = Column(String)  # Contraseña en formato hash
-    role = Column(String)  # Puede ser "admin" o "user"
+    password = Column(String)  
+    role = Column(String)  
 
-# Configuración de SQLite
 engine = create_engine('sqlite:///database.db')
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(bind=engine)

@@ -135,7 +135,7 @@ button:nth-child(1):hover {
 }
 
 .table-container {
-    max-height: 80rem; 
+    max-height: 50rem; 
     overflow-y: auto;
     border: 1px solid #ddd;
 }

@@ -18,22 +18,25 @@ document.addEventListener('DOMContentLoaded', () => {
         playerTable.innerHTML = '';
 
         const uniquePlayers = new Map();
-        players.forEach(player => {
-            const key = `${player.name}-${player.team}`; 
+        players.reverse().forEach(player => {
+            const key = `${player.name}-${player.team}`;
             if (!uniquePlayers.has(key)) {
                 uniquePlayers.set(key, player);
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${player.name}</td>
-                    <td>${player.team}</td>
-                    <td>
-                        <button onclick="editPlayer(${player.id})">Editar</button>
-                        <button onclick="deletePlayer(${player.id})">Eliminar</button>
-                    </td>
-                `;
-                playerTable.appendChild(row);
             }
         });
+
+        for (let player of uniquePlayers.values()) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${player.name}</td>
+                <td>${player.team}</td>
+                <td>
+                    <button onclick="editPlayer(${player.id})">Editar</button>
+                    <button onclick="deletePlayer(${player.id})">Eliminar</button>
+                </td>
+            `;
+            playerTable.appendChild(row);
+        }
     }
 
     form.addEventListener('submit', async (e) => {
@@ -58,11 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify(playerData)
                 });
                 if (!response.ok) throw new Error('Error al editar jugador');
-                editingPlayerId = null; 
+                editingPlayerId = null;
             }
 
-            form.reset(); 
-            getPlayers(); 
+            form.reset();
+            getPlayers();
         } catch (error) {
             console.error(error);
         }
@@ -75,25 +78,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const player = await response.json();
             document.getElementById('name').value = player.name;
             document.getElementById('team').value = player.team;
-            editingPlayerId = id; 
+            editingPlayerId = id;
         } catch (error) {
             console.error(error);
         }
     };
 
-    // Función para eliminar un jugador
     window.deletePlayer = async (id) => {
         try {
             const response = await fetch(`http://127.0.0.1:5000/players/${id}`, {
                 method: 'DELETE'
             });
             if (!response.ok) throw new Error('Error al eliminar jugador');
-            getPlayers(); // Actualizar la lista de jugadores después de eliminar
+            getPlayers();
         } catch (error) {
             console.error(error);
         }
     };
 
-    // Cargar los jugadores al inicio
     getPlayers();
 });
